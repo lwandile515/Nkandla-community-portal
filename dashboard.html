@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Community Portal - Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>🌍 Welcome, <span id="user"></span>!</h2>
+    <p>Choose where you want to go:</p>
+    <button onclick="location.href='school.html'">🏫 Mnyakanya School</button>
+    <button onclick="location.href='clinic.html'">🏥 KwaNxamalala Clinic</button>
+    <button onclick="location.href='police.html'">🚓 KwaNxamalala Police</button>
+    <button onclick="location.href='ai.html'">🤖 AI Assistant</button>
+  </div>
+  <script>
+    document.getElementById("user").innerText = localStorage.getItem("loggedInUser") || "Guest";
+  </script>
+</body>
+</html>

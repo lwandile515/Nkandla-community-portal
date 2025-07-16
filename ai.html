@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Community AI Assistant</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #4facfe, #00f2fe);
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+
+    .chat-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 15px #00f2fe;
+    }
+
+    .chat-box {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-bottom: 15px;
+      background: #111;
+      border-radius: 10px;
+    }
+
+    .chat-message {
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: #009ffd;
+      animation: fadeIn 0.3s;
+    }
+
+    .user-message {
+      background: #00c9a7;
+      text-align: right;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ff512f;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #dd2476;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body { background: #121212; color: #eee; }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h2>🧠 Smart Community Assistant</h2>
+    <div class="chat-box" id="chatBox">
+      <div class="chat-message">👋 Loading Assistant...</div>
+    </div>
+
+    <div class="controls">
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="startListening()">🎤</button>
+      <button onclick="showHelp()">❓ Help</button>
+    </div>
+
+    <p style="text-align:center;font-size:14px;margin-top:10px;">
+      Created by <strong>Lwandile Shezi</strong> · Grade 11 · Mnyakanya Secondary School
+    </p>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("userInput");
+
+    // 🧠 Adds a message to the chat box
+    function addMessage(text, fromUser = false, delay = 0) {
+      const msg = document.createElement("div");
+      msg.className = "chat-message";
+      if (fromUser) msg.classList.add("user-message");
+      msg.innerText = "Typing...";
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      setTimeout(() => {
+        msg.innerText = text;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, delay || 500);
+    }
+
+    // 🎙️ Makes the assistant speak
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-ZA';
+        speechSynthesis.speak(utter);
+      }
+    }
+
+    // 🧠 Responds to user commands
+    function handleCommand(text) {
+      let response = "";
+
+      if (text.includes("register")) {
+        response = "To register a learner, go to the School section.";
+      } else if (text.includes("clinic")) {
+        response = "The clinic offers checkups, vaccinations, and basic care.";
+      } else if (text.includes("police")) {
+        response = "You can report issues like missing persons or crimes in the Police section.";
+      } else if (text.includes("who made") || text.includes("creator")) {
+        response = "This website was created by Lwandile Shezi, a learner at Mnyakanya Secondary School.";
+      } else if (text.includes("where is") && text.includes("school")) {
+        response = "Mnyakanya Secondary School is located in Nkandla, KwaZulu-Natal.";
+      } else if (text.includes("what is") && text.includes("website")) {
+        response = "This website connects the school, clinic, and police to the local community.";
+      } else if (text.includes("sawubona") || text.includes("unjani")) {
+        response = "Sawubona! Ngiyaphila, unjani wena?";
+      } else if (text.includes("ngiyabonga")) {
+        response = "Ngiyabonga nawe!";
+      } else {
+        response = "Sorry, I didn’t understand that. Try asking about registration, clinic, or police.";
+      }
+
+      addMessage(response, false, 600);
+      speak(response);
+    }
+
+    // 💬 When user clicks Send or presses Enter
+    function sendMessage() {
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      addMessage(userText, true);
+      handleCommand(userText.toLowerCase());
+      input.value = '';
+    }
+
+    // 🎤 Start listening to voice
+    function startListening() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert("Voice recognition is not supported in this browser.");
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-ZA';
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        const spoken = event.results[0][0].transcript;
+        addMessage(spoken, true);
+        handleCommand(spoken.toLowerCase());
+      };
+
+      recognition.onerror = function(event) {
+        addMessage("Voice error: " + event.error);
+      };
+    }
+
+    // ❓ Shows help menu
+    function showHelp() {
+      const helpText = `
+Try saying or typing:
+• Register a learner
+• Where is the school?
+• Who made this?
+• What is this website for?
+• Clinic services
+• Police help
+• Sawubona
+• Ngiyabonga
+`;
+      addMessage(helpText, false, 300);
+    }
+
+    // 👋 Greet when page loads
+    window.onload = () => {
+      const greet = "Sawubona! Hello, welcome to the Smart Community Assistant.";
+      addMessage(greet);
+      speak(greet);
+    };
+
+    // ⌨️ Pressing Enter = Send
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
